@@ -54,6 +54,8 @@ void * sound_handler(void *arg)
 
         usleep(100);
     }
+
+    return NULL;
 }
 
 // @NOTE: Stk is very tricky, particularly in linux.  So I have found that I cannot work on two buffers at the same time and I needed to serialize the access.
