@@ -9,6 +9,7 @@
 #define YAMATHUTIL_H_
 
 #include <math.h>
+#include <cstdint>
 #include "vec3f.h"
 
 #ifndef PI
