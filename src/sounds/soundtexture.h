@@ -1,8 +1,8 @@
 #ifndef SOUNDTEXTURE_H
 #define SOUNDTEXTURE_H
 
-#include <FileWvIn.h>
-#include <RtAudio.h>
+#include <stk/FileWvIn.h>
+#include <stk/RtAudio.h>
 
 #include <signal.h>
 #include <iostream>
