@@ -27,7 +27,7 @@ from Fps import Fps
 # This is the port where the simulator is waiting for commands
 # The structure is given in ../commandorder.h/CommandOrder
 ctrlsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-ip = '192.168.122.219'
+ip = '127.0.0.1'
 controlport = 4501
 
 
