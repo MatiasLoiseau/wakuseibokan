@@ -80,8 +80,8 @@ def send_command(timer, controllingid, thrust, roll, pitch, yaw, precesion, bank
     return
 
 # Telemetry length and package form (for receiving messages from the engine)
-length = 84
-unpackcode = 'Liiiffffffffffffffff'
+length = 80
+unpackcode = '<Lififfffffffffffffff'
 
 
 # UDP Telemetry port on port 4500
@@ -146,7 +146,7 @@ while True:
 
             polardistance = math.sqrt( vec2d[0] ** 2 + vec2d[1] ** 2)
 
-            print(polardistance);
+            print(f"Time: {new_values[td['timer']]} Polar Distance: {polardistance}")
 
             if polardistance < 1700:
                 thrust = 10.0
