@@ -13,6 +13,7 @@ import numpy as np
 from TelemetryDictionary import telemetrydirs as td
 from Command import Command
 from Command import Recorder
+import Configuration
 from Fps import Fps
 
 class Controller:
@@ -48,7 +49,7 @@ class Controller:
 
     def run(self):
         # Initialize command sender to simulator with specific control port
-        command = Command('192.168.122.219', 4500 + self.tank)  # Replace with the your server IP
+        command = Command(Configuration.ip, 4500 + self.tank)  # Replace with the your server IP
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d-%H-%M-%S')
         f = open(f'./data/sensor.{st}.dat', 'w')  # Log file for sensor data
@@ -75,7 +76,7 @@ class Controller:
 
                 # Update FPS and print to console
                 self.fps.steptoc()
-                print(f"Fps: {self.fps.fps}")
+                #print(f"Fps: {self.fps.fps}")
 
                 # Detect if a new episode has started
                 if int(myvalues[td['timer']]) < self.mytimer:
@@ -101,6 +102,8 @@ class Controller:
                 steering = 0.0
                 turretdecl = 0.0
                 turretbearing = 0.0
+                
+                command.fire()
 
                 # Send command to simulator
                 command.send_command(myvalues[td['timer']], self.tank, thrust,
@@ -121,5 +124,10 @@ class Controller:
 # Example: python Controller.py 1
 # TIP: You can open two terminals and run python Controller.py 1 in one, and python Controller.py 2 in the other.
 if __name__ == '__main__':
+    
+    if len(sys.argv) < 2:
+        print("Usage: python Controller.py [tank_number]")
+        sys.exit(1)
+    
     controller = Controller(sys.argv[1])
     controller.run()

@@ -1,11 +1,10 @@
 '''
-UDP Telemetry Receiving and Episode Recording
+Seek and Destroying Script
 
 This script receives the information from the simulator (the telemetry)
-picks only the data that corresponds to one of the tanks, and sends
-a command to the simulator to control the tank.
-
-This code is used to register many episodes from the game and to create a database.
+identify where the other tank is located, the bearing and the distance, 
+and sends the command to the tank to move its trajectory to redirect towards
+the other tank for shooting it when it is close enough.
 
 Real time Data Science
 
@@ -21,6 +20,7 @@ import numpy as np
 
 from Command import Command
 from Command import Recorder
+import Configuration
 
 FIRE = 11
 
@@ -101,8 +101,8 @@ class Controller:
         self.sock.bind(self.server_address)
         self.sock.settimeout(5)
 
-        self.length = 84
-        self.unpackcode = 'Lififfffffffffffffff'
+        self.length = 80
+        self.unpackcode = '<Lififfffffffffffffff'
 
         self.recorder = Recorder()
 
@@ -123,15 +123,13 @@ class Controller:
     
     def run(self):
         if (self.tank == 1):
-            command = Command('127.0.0.1', 4501)
+            command = Command(Configuration.ip, 4501)
         elif (self.tank == 2):
-            command = Command('127.0.0.1', 4502)
-            
-        
-        #q_table = np.zeros([5 * 5 * 5 * 4 , env.action_space.n])    
+            command = Command(Configuration.ip, 4502)
+             
 
         while (True):
-            #try:
+            try:
                 tank1values = self.read()
                 if int(tank1values[td['number']]) != 1:
                     continue
@@ -170,6 +168,8 @@ class Controller:
                     steering = 0
 
                 turretbearing = aim(myvalues,othervalues)
+                
+                turretdeclination = np.random.uniform(-0.4, 0.4)
 
                 if (turretbearing > 0.0):
                     steering = 1.0
@@ -196,15 +196,19 @@ class Controller:
 
                 command.send_command(myvalues[td['timer']],self.tank,thrust,
                                      steering,
-                                     0.0,
+                                     turretdeclination,
                                      turretbearing)             
                 
-            #except socket.timeout:
-            #    print("Episode Completed")
-            #    break
+            except socket.timeout:
+                print("Episode Completed")
+                break
 
 
 if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: python SeekAndDestroy.py [tank_number]")
+        sys.exit(1)
+        
     controller = Controller(sys.argv[1])
     controller.run() 
   

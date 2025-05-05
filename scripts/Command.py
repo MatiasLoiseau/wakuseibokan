@@ -50,12 +50,13 @@ class Command:
         # TurretBearing is the rotation of the turret. >0 is right, <0 is left.
 
         #check if the tank is overheated to prevent firing if heatup is not 0
-        if (self.__heatup > 0 and self.command == 11):
-            self.command = 0
+        # (this is not longer necessary, because the simulator is processing that info)
+        #if (self.__heatup > 0 and self.command == 11):
+        #    self.command = 0
             
         
         # This is the structure fron CommandOrder
-        data=pack("iffffffiLiiifffi?i",
+        data=pack("<i6fiiiifffiiI",         
             controllingid,
             thrust,
             steering,
@@ -64,14 +65,16 @@ class Command:
             turretbearing,
             bank,
             faction,
-            timer,
             self.command,    # 0 or 11
             spawnid,
             typeofisland,
             x,y,z,
             target,
-            bit,
-            weapon)
+            weapon,
+            timer)
+        
+        # Check the size of the struct due to cross-platform compatibility issues.
+        #print(calcsize("<i6fiiiifffiiI"))   This  must be 68 to be cross platform.
 
         sent = self.ctrlsock.sendto(data, self.ctrl_server_address)
 
