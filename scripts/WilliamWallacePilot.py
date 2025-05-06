@@ -21,8 +21,6 @@ alpha = 0.05    # Learning rate
 gamma = 0.95   # Discount factor
 epsilon = 0.01  # Exploration rate aumentado  # Exploration rate inicial
 
-qtable_filename = "qtable.npy"
-
 # Definimos discretización
 def discretizar_estado(myvalues, enemyvalues):
     my_x = float(myvalues[td['x']])
@@ -88,7 +86,7 @@ def graficar_recompensas(historial):
     plt.show()
 
 class Controller:
-    def __init__(self, tankparam):
+    def __init__(self, tankparam, qtable_file):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         tankparam = int(tankparam)
         port = 4600 + tankparam
@@ -101,7 +99,7 @@ class Controller:
         self.length = 80
         self.unpackcode = '<Lififfffffffffffffff'
 
-        self.recorder = Recorder()
+        self.qtable_filename = qtable_file
 
         self.tank = tankparam
         self.mytimer = 0
@@ -115,8 +113,8 @@ class Controller:
         return None
 
     def run(self):
-        if os.path.exists(qtable_filename):
-            qtable = np.load(qtable_filename, allow_pickle=True).item()
+        if os.path.exists(self.qtable_filename):
+            qtable = np.load(self.qtable_filename, allow_pickle=True).item()
             print("Q-Table cargada.")
         else:
             qtable = {}
@@ -212,16 +210,19 @@ class Controller:
                 break
 
         if recompensa_total:
-            np.save(qtable_filename, qtable)
+            np.save(self.qtable_filename, qtable)
             print("Q-Table guardada.")
             graficar_recompensas(recompensa_total)
         else:
             print("No se recibió suficiente información. No se actualizó la Q-Table.")
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print("Usage: python Raijin_Stormbot.py [tank_number]")
+    if len(sys.argv) < 3:
+        print("Usage: python WilliamWallacePilot.py [tank_number] [qtable_filename]")
         sys.exit(1)
 
-    controller = Controller(sys.argv[1])
+    tank_number = sys.argv[1]
+    qtable_filename = sys.argv[2]
+
+    controller = Controller(tank_number, qtable_filename)
     controller.run()
